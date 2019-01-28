@@ -71,6 +71,7 @@ function findStoredValue (options) {
   if (opts === undefined) {
     opts = {}
   }
+  const useRelativePath = opts.useRelativePath
 
   la(is.unemptyString(file), 'missing file to find spec for', file)
   const relativePath = fs.fromCurrentFolder(file)
@@ -80,7 +81,7 @@ function findStoredValue (options) {
   }
 
   debug('loading snapshots from %s %s for spec %s', file, ext, relativePath)
-  const snapshots = fs.loadSnapshots(file, ext)
+  const snapshots = fs.loadSnapshots(file, ext, { useRelativePath })
   if (!snapshots) {
     return
   }
@@ -107,6 +108,7 @@ function storeValue (options) {
   if (opts === undefined) {
     opts = {}
   }
+  const useRelativePath = opts.useRelativePath
 
   la(value !== undefined, 'cannot store undefined value')
   la(is.unemptyString(file), 'missing filename', file)
@@ -131,7 +133,7 @@ function storeValue (options) {
 
   // how to serialize comments?
   // as comments above each key?
-  const snapshots = fs.loadSnapshots(file, ext)
+  const snapshots = fs.loadSnapshots(file, ext, { useRelativePath })
   const key = exactSpecName || formKey(specName, index)
   snapshots[key] = value
 
@@ -142,7 +144,7 @@ function storeValue (options) {
   }
 
   if (!opts.dryRun) {
-    fs.saveSnapshots(file, snapshots, ext)
+    fs.saveSnapshots(file, snapshots, ext, { useRelativePath })
     debug('saved updated snapshot %d for spec "%s"', index, specName)
 
     debugSave(
@@ -237,17 +239,17 @@ function core (options) {
         const key = formKey(specName, index)
         throw new Error(
           'Cannot store new snapshot value\n' +
-            'in ' +
-            fileParameter +
-            '\n' +
-            'for spec called "' +
-            specName +
-            '"\n' +
-            'test key "' +
-            key +
-            '"\n' +
-            'when running on CI (opts.ci = 1)\n' +
-            'see https://github.com/bahmutov/snap-shot-core/issues/5'
+          'in ' +
+          fileParameter +
+          '\n' +
+          'for spec called "' +
+          specName +
+          '"\n' +
+          'test key "' +
+          key +
+          '"\n' +
+          'when running on CI (opts.ci = 1)\n' +
+          'see https://github.com/bahmutov/snap-shot-core/issues/5'
         )
       }
 
