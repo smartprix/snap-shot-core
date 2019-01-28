@@ -18,6 +18,10 @@ const cwd = process.cwd()
 const fromCurrentFolder = path.relative.bind(null, cwd)
 const snapshotsFolder = fromCurrentFolder('__snapshots__')
 
+function getSnapshotsFolder (specFile) {
+  return path.join(path.resolve(path.dirname(specFile)), '__snapshots__')
+}
+
 function loadSnaps (snapshotPath) {
   const full = require.resolve(snapshotPath)
   if (!fs.existsSync(snapshotPath)) {
@@ -42,11 +46,13 @@ function loadSnaps (snapshotPath) {
   }
 }
 
-function fileForSpec (specFile, ext) {
+function fileForSpec (specFile, ext, opts) {
+  if (opts === undefined) opts = {}
+
   la(is.maybe.string(ext), 'invalid extension to find', ext)
 
   const specName = path.basename(specFile)
-  let filename = path.join(snapshotsFolder, specName)
+  let filename = path.join(opts.useRelativePath ? getSnapshotsFolder(specFile) : snapshotsFolder, specName)
   if (ext) {
     if (!filename.endsWith(ext)) {
       filename += ext
@@ -55,10 +61,12 @@ function fileForSpec (specFile, ext) {
   return path.resolve(filename)
 }
 
-function loadSnapshots (specFile, ext) {
+function loadSnapshots (specFile, ext, opts) {
+  if (opts === undefined) opts = {}
+
   la(is.unemptyString(specFile), 'missing specFile name', specFile)
 
-  const filename = fileForSpec(specFile, ext)
+  const filename = fileForSpec(specFile, ext, opts)
   debug('loading snapshots from %s', filename)
   let snapshots = {}
   if (fs.existsSync(filename)) {
@@ -83,8 +91,10 @@ function prepareFragments (snapshots) {
 }
 
 // returns snapshot text
-function saveSnapshots (specFile, snapshots, ext) {
-  mkdirp.sync(snapshotsFolder)
+function saveSnapshots (specFile, snapshots, ext, opts) {
+  if (opts === undefined) opts = {}
+
+  mkdirp.sync(opts.useRelativePath ? getSnapshotsFolder(specFile) : snapshotsFolder)
   const filename = fileForSpec(specFile, ext)
   const specRelativeName = fromCurrentFolder(specFile)
   debug('saving snapshots into %s for %s', filename, specRelativeName)
