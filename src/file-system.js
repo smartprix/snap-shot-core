@@ -95,7 +95,7 @@ function saveSnapshots (specFile, snapshots, ext, opts) {
   if (opts === undefined) opts = {}
 
   mkdirp.sync(opts.useRelativePath ? getSnapshotsFolder(specFile) : snapshotsFolder)
-  const filename = fileForSpec(specFile, ext)
+  const filename = fileForSpec(specFile, ext, opts)
   const specRelativeName = fromCurrentFolder(specFile)
   debug('saving snapshots into %s for %s', filename, specRelativeName)
   debug('snapshots are')
