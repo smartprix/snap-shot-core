@@ -1,7 +1,7 @@
 {
   "name": "@smpx/snap-shot-core",
   "description": "Save / load named snapshots, useful for tests",
-  "version": "7.1.12",
+  "version": "7.2.0",
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
   "bugs": "https://github.com/smartprix/snap-shot-core/issues",
   "config": {
@@ -56,7 +56,8 @@
   "license": "MIT",
   "main": "src/",
   "publishConfig": {
-    "registry": "http://registry.npmjs.org/"
+    "registry": "http://registry.npmjs.org/",
+    "access": "public"
   },
   "repository": {
     "type": "git",
