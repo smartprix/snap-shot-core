@@ -1,5 +1,3 @@
-[![TODO board](https://imdone.io/api/1.0/projects/5b1adebb4f7fd004e58ef569/badge)](https://imdone.io/app#/board/bahmutov/snap-shot-core)
-
 # snap-shot-core
 
 > Save / load named snapshots, useful for tests
@@ -9,18 +7,17 @@
 [![Build status][ci-image] ][ci-url]
 [![semantic-release][semantic-image] ][semantic-url]
 [![js-standard-style][standard-image]][standard-url]
-[![renovate-app badge][renovate-badge]][renovate-app]
 
 This is the snapshot loading and saving utility, used by
-[snap-shot-it][snap-shot-it] and [schema-shot][schema-shot] projects.
+[snap-shot-it][snap-shot-it] project.
 Can be used to save snapshots from any testing project.
 
 ```sh
-npm install --save-dev snap-shot-core
+npm install --save-dev @smpx/snap-shot-core
 ```
 
 ```js
-const snapShot = require('snap-shot-core')
+const snapShot = require('@smpx/snap-shot-core')
 const what // my object
 const out = snapShot.core({
   what,
@@ -125,6 +122,17 @@ from the environment variables.
 - `dryRun` - only show the new snapshot value, but do not save it
 - `update` - override snapshot value with the new one if there is difference
 - `ci` - the tests are running on CI, which should disallow _saving snapshots_
+- `useRelativePath` - the `__snapshots__` directory is made right next to the test file.
+  This is read from package.json. See below for format fo config.
+
+### Config in package.json
+```json
+{
+  "snap-shot-it": {
+    "useRelativePath": true
+  }
+}
+```
 
 ```js
 const opts = {
@@ -132,6 +140,7 @@ const opts = {
   dryRun: Boolean(process.env.DRY),
   update: Boolean(process.env.UPDATE),
   ci: Boolean(process.env.CI),
+  useRelativePath: (require(process.cwd() + '/package.json')['snap-shot-it'] || {}).useRelativePath
 }
 snapShot.core({
   what,
@@ -220,7 +229,7 @@ tape example:
 ```js
 //foo.test.js
 const test = require('tape')
-const snapShot = require('snap-shot-core')
+const snapShot = require('@smpx/snap-shot-core')
 
 test.onFinish(snapShot.restore)
 
@@ -237,12 +246,15 @@ test('one test', function(t) {
 You can restore / reset a counter for a particular test
 
 ```js
-const snapShot = require('snap-shot-core')
+const snapShot = require('@smpx/snap-shot-core')
 snapShot.restore({
   file: __filename,
   specName: 'this test',
 })
 ```
+
+
+## Original Author and License:
 
 ### Small print
 
@@ -257,7 +269,7 @@ License: MIT - do anything with the code, but don't blame me if it does not work
 Support: if you find any problems with this module, email / tweet /
 [open issue](https://github.com/bahmutov/snap-shot-core/issues) on Github
 
-## MIT License
+### MIT License
 
 Copyright (c) 2017 Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt;
 
@@ -282,7 +294,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-[npm-icon]: https://nodei.co/npm/snap-shot-core.svg?downloads=true
+[npm-icon]: https://nodei.co/npm/@smpx/snap-shot-core.svg?downloads=true
 [npm-url]: https://npmjs.org/package/@smpx/snap-shot-core
 [ci-image]: https://travis-ci.org/smartprix/snap-shot-core.svg?branch=master
 [ci-url]: https://travis-ci.org/smartprix/snap-shot-core
@@ -290,7 +302,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 [semantic-url]: https://github.com/semantic-release/semantic-release
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
-[renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
-[renovate-app]: https://renovateapp.com/
 [snap-shot-it]: https://github.com/smartprix/snap-shot-it
 [schema-shot]: https://github.com/bahmutov/schema-shot
