@@ -1,9 +1,9 @@
 {
-  "name": "snap-shot-core",
+  "name": "@smpx/snap-shot-core",
   "description": "Save / load named snapshots, useful for tests",
-  "version": "0.0.0-development",
+  "version": "7.1.12",
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
-  "bugs": "https://github.com/bahmutov/snap-shot-core/issues",
+  "bugs": "https://github.com/smartprix/snap-shot-core/issues",
   "config": {
     "pre-git": {
       "commit-msg": "simple",
@@ -47,7 +47,7 @@
     "src/*.js",
     "!src/*-spec.js"
   ],
-  "homepage": "https://github.com/bahmutov/snap-shot-core#readme",
+  "homepage": "https://github.com/smartprix/snap-shot-core#readme",
   "keywords": [
     "snapshot",
     "test",
@@ -60,7 +60,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bahmutov/snap-shot-core.git"
+    "url": "https://github.com/smartprix/snap-shot-core.git"
   },
   "scripts": {
     "ban": "ban",
