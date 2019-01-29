@@ -23,9 +23,9 @@ const stubs = {
 console.log('stubs', stubs)
 
 const proxyquire = require('proxyquire')
-const snapshot = proxyquire('snap-shot-it', stubs)
+const snapshot = proxyquire('@smpx/snap-shot-it', stubs)
 
-// const snapshot = require('snap-shot-it')
+// const snapshot = require('@smpx/snap-shot-it')
 
 /* eslint-env mocha */
 it('a', () => {

@@ -283,14 +283,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 [npm-icon]: https://nodei.co/npm/snap-shot-core.svg?downloads=true
-[npm-url]: https://npmjs.org/package/snap-shot-core
-[ci-image]: https://travis-ci.org/bahmutov/snap-shot-core.svg?branch=master
-[ci-url]: https://travis-ci.org/bahmutov/snap-shot-core
+[npm-url]: https://npmjs.org/package/@smpx/snap-shot-core
+[ci-image]: https://travis-ci.org/smartprix/snap-shot-core.svg?branch=master
+[ci-url]: https://travis-ci.org/smartprix/snap-shot-core
 [semantic-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 [semantic-url]: https://github.com/semantic-release/semantic-release
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
 [renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
 [renovate-app]: https://renovateapp.com/
-[snap-shot-it]: https://github.com/bahmutov/snap-shot-it
+[snap-shot-it]: https://github.com/smartprix/snap-shot-it
 [schema-shot]: https://github.com/bahmutov/schema-shot
