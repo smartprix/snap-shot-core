@@ -122,17 +122,7 @@ from the environment variables.
 - `dryRun` - only show the new snapshot value, but do not save it
 - `update` - override snapshot value with the new one if there is difference
 - `ci` - the tests are running on CI, which should disallow _saving snapshots_
-- `useRelativePath` - the `__snapshots__` directory is made right next to the test file.
-  This is read from package.json. See below for format fo config.
-
-### Config in package.json
-```json
-{
-  "snap-shot-it": {
-    "useRelativePath": true
-  }
-}
-```
+- `useRelativePath` - if true the `__snapshots__` directory is made right next to the test file.
 
 ```js
 const opts = {
@@ -140,7 +130,7 @@ const opts = {
   dryRun: Boolean(process.env.DRY),
   update: Boolean(process.env.UPDATE),
   ci: Boolean(process.env.CI),
-  useRelativePath: (require(process.cwd() + '/package.json')['snap-shot-it'] || {}).useRelativePath
+  useRelativePath: Boolean(config.useRelativePath),
 }
 snapShot.core({
   what,
