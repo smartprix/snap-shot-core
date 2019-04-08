@@ -6,6 +6,8 @@ const la = require('lazy-ass')
 const is = require('check-more-types')
 const utils = require('./utils')
 const isCI = require('is-ci')
+const quote = require('quote')
+const R = require('ramda')
 
 const snapshotIndex = utils.snapshotIndex
 const strip = utils.strip
@@ -40,7 +42,7 @@ var snapshotsPerTest = {}
  * Forms unique long name for a snapshot
  * @param {string} specName
  * @param {number} oneIndex
-*/
+ */
 const formKey = (specName, oneIndex) => `${specName} ${oneIndex}`
 
 function restore (options) {
@@ -108,7 +110,6 @@ function storeValue (options) {
   if (opts === undefined) {
     opts = {}
   }
-  const useRelativePath = opts.useRelativePath
 
   la(value !== undefined, 'cannot store undefined value')
   la(is.unemptyString(file), 'missing filename', file)
@@ -133,7 +134,7 @@ function storeValue (options) {
 
   // how to serialize comments?
   // as comments above each key?
-  const snapshots = fs.loadSnapshots(file, ext, { useRelativePath })
+  const snapshots = fs.loadSnapshots(file, ext, R.pick(['useRelativePath'], opts))
   const key = exactSpecName || formKey(specName, index)
   snapshots[key] = value
 
@@ -144,7 +145,7 @@ function storeValue (options) {
   }
 
   if (!opts.dryRun) {
-    fs.saveSnapshots(file, snapshots, ext, { useRelativePath })
+    fs.saveSnapshots(file, snapshots, ext, R.pick(['sortSnapshots', 'useRelativePath'], opts))
     debug('saved updated snapshot %d for spec "%s"', index, specName)
 
     debugSave(
@@ -158,7 +159,34 @@ function storeValue (options) {
 
 const isPromise = x => is.object(x) && is.fn(x.then)
 
+function throwCannotSaveOnCI ({
+  value,
+  fileParameter,
+  exactSpecName,
+  specName,
+  index
+}) {
+  const key = exactSpecName || formKey(specName, index)
+  throw new Error(
+    'Cannot store new snapshot value\n' +
+    'in ' +
+    quote(fileParameter) +
+    '\n' +
+    'for snapshot called ' +
+    quote(exactSpecName || specName) +
+    '\n' +
+    'test key ' +
+    quote(key) +
+    '\n' +
+    'when running on CI (opts.ci = 1)\n' +
+    'see https://github.com/bahmutov/snap-shot-core/issues/5'
+  )
+}
+
 function core (options) {
+  la(is.object(options), 'missing options argument', options)
+  options = R.clone(options) // to avoid accidental mutations
+
   const what = options.what // value to store
   la(
     what !== undefined,
@@ -194,6 +222,11 @@ function core (options) {
   if (!('ci' in opts)) {
     debug('set CI flag to %s', isCI)
     opts.ci = isCI
+  }
+
+  if (!('sortSnapshots' in opts)) {
+    debug('setting sortSnapshots flags to true')
+    opts.sortSnapshots = true
   }
 
   if (ext) {
@@ -236,21 +269,13 @@ function core (options) {
       if (opts.ci) {
         console.log('current directory', process.cwd())
         console.log('new value to save: %j', value)
-        const key = formKey(specName, index)
-        throw new Error(
-          'Cannot store new snapshot value\n' +
-          'in ' +
-          fileParameter +
-          '\n' +
-          'for spec called "' +
-          specName +
-          '"\n' +
-          'test key "' +
-          key +
-          '"\n' +
-          'when running on CI (opts.ci = 1)\n' +
-          'see https://github.com/bahmutov/snap-shot-core/issues/5'
-        )
+        return throwCannotSaveOnCI({
+          value,
+          fileParameter,
+          exactSpecName,
+          specName,
+          index
+        })
       }
 
       const storedValue = store(value)
@@ -296,5 +321,6 @@ const prune = require('./prune')(fs).pruneSnapshots
 module.exports = {
   core,
   restore,
-  prune
+  prune,
+  throwCannotSaveOnCI
 }

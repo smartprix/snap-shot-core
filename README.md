@@ -76,7 +76,7 @@ function compare({ expected, value }) {
 Another one, that compares values by type could be even simpler
 
 ```js
-const sameTypes = (a, b) => typeof expected === typeof value
+const sameTypes = (a, b) => typeof a === typeof b
 
 const compareTypes = ({ expected, value }) =>
   sameTypes(expected, value) ? Result.Ok() : Result.Error('types are different')
@@ -123,14 +123,17 @@ from the environment variables.
 - `update` - override snapshot value with the new one if there is difference
 - `ci` - the tests are running on CI, which should disallow _saving snapshots_
 - `useRelativePath` - if true the `__snapshots__` directory is made right next to the test file.
+- `sortSnapshots` - enable sorting snapshots by name when saving (default is true)
 
 ```js
+// for example to use environment variables
 const opts = {
   show: Boolean(process.env.SHOW),
   dryRun: Boolean(process.env.DRY),
   update: Boolean(process.env.UPDATE),
   ci: Boolean(process.env.CI),
   useRelativePath: Boolean(config.useRelativePath),
+  sortSnapshots: true
 }
 snapShot.core({
   what,
@@ -243,6 +246,15 @@ snapShot.restore({
 })
 ```
 
+## Resaving snaphots
+
+You can re-save snapshot file (for example to escape it again, or to resort the snapshots by name) using [bin/resave-snapshots.js](bin/resave-snapshots.js) script. After installing this module, run `bin` script
+
+```bash
+$(npm bin)/resave-snapshots [--sort] snapshot-filename
+```
+
+To just re-escape the snapshots omit the `--sort` flag.
 
 ## Original Author and License:
 

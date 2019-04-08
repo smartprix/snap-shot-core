@@ -77,9 +77,35 @@ describe('exportText', () => {
     la(is.fn(exportText))
   })
 
+  it('does escape backtick on the text', () => {
+    const formatted = exportText('name', '`code`')
+    const expected = "exports['name'] = `\n\\`code\\`\n`\n"
+    la(formatted === expected, 'expected\n' + expected + '\ngot\n' + formatted)
+  })
+
+  it('does escape template variable on the text', () => {
+    /* eslint-disable no-template-curly-in-string */
+    const formatted = exportText('name', '`${1}`')
+    const expected = "exports['name'] = `\n\\`\\${1}\\`\n`\n"
+    la(formatted === expected, 'expected\n' + expected + '\ngot\n' + formatted)
+    /* eslint-enable no-template-curly-in-string */
+  })
+
+  it('does not replace \\n with \n on the text', () => {
+    const formatted = exportText('name', 'escaped \\n')
+    const expected = "exports['name'] = `\nescaped \\\\n\n`\n"
+    la(formatted === expected, 'expected\n' + expected + '\ngot\n' + formatted)
+  })
+
   it('does not put value on the first line', () => {
     const formatted = exportText('name', 'foo')
     const expected = "exports['name'] = `\nfoo\n`\n"
+    la(formatted === expected, 'expected\n' + expected + '\ngot\n' + formatted)
+  })
+
+  it('escapes unicode emoji', () => {
+    const formatted = exportText('reaction', '😁')
+    const expected = "exports['reaction'] = `\n\\uD83D\\uDE01\n`\n"
     la(formatted === expected, 'expected\n' + expected + '\ngot\n' + formatted)
   })
 })

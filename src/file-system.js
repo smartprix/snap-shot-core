@@ -22,6 +22,11 @@ function getSnapshotsFolder (specFile) {
   return path.join(path.resolve(path.dirname(specFile)), '__snapshots__')
 }
 
+const isOptions = is.schema({
+  sortSnapshots: is.bool,
+  useRelativePath: (val) => is.bool(val) || is.not.defined(val)
+})
+
 function loadSnaps (snapshotPath) {
   const full = require.resolve(snapshotPath)
   if (!fs.existsSync(snapshotPath)) {
@@ -46,9 +51,7 @@ function loadSnaps (snapshotPath) {
   }
 }
 
-function fileForSpec (specFile, ext, opts) {
-  if (opts === undefined) opts = {}
-
+function fileForSpec (specFile, ext, opts = { useRelativePath: false }) {
   la(is.maybe.string(ext), 'invalid extension to find', ext)
 
   const specName = path.basename(specFile)
@@ -61,12 +64,9 @@ function fileForSpec (specFile, ext, opts) {
   return path.resolve(filename)
 }
 
-function loadSnapshots (specFile, ext, opts) {
-  if (opts === undefined) opts = {}
+function loadSnapshotsFrom (filename) {
+  la(is.unemptyString(filename), 'missing snapshots filename', filename)
 
-  la(is.unemptyString(specFile), 'missing specFile name', specFile)
-
-  const filename = fileForSpec(specFile, ext, opts)
   debug('loading snapshots from %s', filename)
   let snapshots = {}
   if (fs.existsSync(filename)) {
@@ -77,8 +77,21 @@ function loadSnapshots (specFile, ext, opts) {
   return snapshots
 }
 
-function prepareFragments (snapshots) {
-  const fragments = Object.keys(snapshots).sort().map(testName => {
+function loadSnapshots (specFile, ext, opts = { useRelativePath: false }) {
+  la(is.unemptyString(specFile), 'missing specFile name', specFile)
+
+  const filename = fileForSpec(specFile, ext, opts)
+  return loadSnapshotsFrom(filename)
+}
+
+function prepareFragments (snapshots, opts = { sortSnapshots: true }) {
+  la(isOptions(opts), 'expected prepare fragments options', opts)
+
+  const names = opts.sortSnapshots
+    ? Object.keys(snapshots).sort()
+    : Object.keys(snapshots)
+
+  const fragments = names.map(testName => {
     debug(`snapshot name "${testName}"`)
     const value = snapshots[testName]
     const escapedName = escapeQuotes(testName)
@@ -90,9 +103,23 @@ function prepareFragments (snapshots) {
   return fragments
 }
 
+function maybeSortAndSave (snapshots, filename, opts = { sortSnapshots: true }) {
+  const fragments = prepareFragments(snapshots, opts)
+  debug('have %s', pluralize('fragment', fragments.length, true))
+
+  const s = fragments.join('\n')
+  fs.writeFileSync(filename, s, 'utf8')
+  return s
+}
+
 // returns snapshot text
-function saveSnapshots (specFile, snapshots, ext, opts) {
-  if (opts === undefined) opts = {}
+function saveSnapshots (
+  specFile,
+  snapshots,
+  ext,
+  opts = { sortSnapshots: true, useRelativePath: false }
+) {
+  la(isOptions(opts), 'expected save snapshots options', opts)
 
   mkdirp.sync(opts.useRelativePath ? getSnapshotsFolder(specFile) : snapshotsFolder)
   const filename = fileForSpec(specFile, ext, opts)
@@ -101,12 +128,7 @@ function saveSnapshots (specFile, snapshots, ext, opts) {
   debug('snapshots are')
   debug(snapshots)
 
-  const fragments = prepareFragments(snapshots)
-  debug('have %s', pluralize('fragment', fragments.length, true))
-
-  const s = fragments.join('\n')
-  fs.writeFileSync(filename, s, 'utf8')
-  return s
+  return maybeSortAndSave(snapshots, filename, opts)
 }
 
 const isValidCompareResult = is.schema({
@@ -156,7 +178,9 @@ module.exports = {
   readFileSync: fs.readFileSync,
   fromCurrentFolder,
   loadSnapshots,
+  loadSnapshotsFrom,
   saveSnapshots,
+  maybeSortAndSave,
   raiseIfDifferent,
   fileForSpec,
   exportText,
