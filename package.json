@@ -1,7 +1,7 @@
 {
   "name": "@smpx/snap-shot-core",
   "description": "Save / load named snapshots, useful for tests",
-  "version": "7.2.1",
+  "version": "7.3.0",
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
   "bugs": "https://github.com/smartprix/snap-shot-core/issues",
   "config": {
